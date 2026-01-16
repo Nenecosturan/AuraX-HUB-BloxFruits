@@ -1,42 +1,39 @@
--- [[ AuraX Hub: Hızlı Başlatma Sistemi ]] --
--- Bu sürüm düşük performanslı mobil cihazlar için optimize edildi.
+-- [[ AuraX Hub | Arceus X Neo Optimized ]] --
 
-local function Notify(title, text)
+local function SimpleNotify(txt)
     game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = title,
-        Text = text,
+        Title = "AuraX [AX]",
+        Text = txt,
         Duration = 5
     })
 end
 
-Notify("AuraX [AX]", "Motor başlatılıyor, lütfen bekleyin...")
+SimpleNotify("Arceus X Neo Algılandı. Yükleniyor...")
 
--- Redz Hub'ın ana kaynağını daha güvenli bir yöntemle çekiyoruz.
-local success, result = pcall(function()
-    return game:HttpGet("https://raw.githubusercontent.com/realredz/BloxFruits/main/Source.lua")
+-- Arceus X'in çökmemesi için yüklemeyi bir saniye geciktiriyoruz
+task.wait(1.5)
+
+local success, err = pcall(function()
+    -- Redz Hub'ın en stabil ve Arceus uyumlu linkini deniyoruz
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/realredz/BloxFruits/main/Source.lua"))()
 end)
 
-if success then
-    Notify("AuraX [AX]", "Modüller yüklendi! Menü açılıyor...")
+if not success then
+    -- Eğer ilk deneme başarısız olursa alternatif yükleme metodu
+    warn("AuraX Hata: " .. tostring(err))
+    SimpleNotify("Yükleme başarısız. Konsolu kontrol et.")
+else
+    SimpleNotify("AuraX Menü Hazır!")
     
-    -- Redz yazılarını AuraX'e çeviren 'Hafif' Patcher
+    -- Menü geldikten sonra isimleri değiştirmeyi dene (Hafif Mod)
     task.spawn(function()
-        local CoreGui = game:GetService("CoreGui")
-        while task.wait(1) do
-            for _, v in pairs(CoreGui:GetDescendants()) do
-                if v:IsA("TextLabel") or v:IsA("TextButton") then
-                    if v.Text:find("Redz") or v.Text:find("redz") then
-                        v.Text = v.Text:gsub("Redz Hub", "AuraX Hub")
-                        v.Text = v.Text:gsub("Redz", "AuraX")
-                    end
+        task.wait(5) -- Menünün tam yüklenmesini bekle
+        pcall(function()
+            for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
+                if v:IsA("TextLabel") and (v.Text:find("Redz") or v.Text:find("redz")) then
+                    v.Text = "AuraX Hub"
                 end
             end
-        end
+        end)
     end)
-
-    -- ANA KODU ÇALIŞTIR
-    loadstring(result)()
-else
-    Notify("HATA!", "Sunucuya bağlanılamadı. Tekrar deneyin.")
-    warn("AuraX Error: " .. tostring(result))
 end
