@@ -1,48 +1,42 @@
--- [[ AuraX Hub: Blox Fruits Ultimate Edition ]] --
--- [[ GitHub: Nenecosturan | Brand: AuraX [AX] ]] --
+-- [[ AuraX Hub: Hızlı Başlatma Sistemi ]] --
+-- Bu sürüm düşük performanslı mobil cihazlar için optimize edildi.
 
--- 1. SİSTEM AYARLARI VE TEMA
-getgenv().AX_Settings = {
-    Title = "AuraX Hub",
-    ThemeColor = Color3.fromRGB(130, 0, 255), -- AuraX Moru
-    LogoID = "rbxassetid://4483345998"
-}
+local function Notify(title, text)
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = title,
+        Text = text,
+        Duration = 5
+    })
+end
 
--- 2. DİNAMİK MASKELERME (PROFESYONEL PATCHER)
--- Bu fonksiyon, Redz Hub'ın tüm görsel elementlerini anlık olarak AuraX'e çevirir.
-task.spawn(function()
-    while task.wait(0.2) do
-        pcall(function()
-            local CoreGui = game:GetService("CoreGui")
+Notify("AuraX [AX]", "Motor başlatılıyor, lütfen bekleyin...")
+
+-- Redz Hub'ın ana kaynağını daha güvenli bir yöntemle çekiyoruz.
+local success, result = pcall(function()
+    return game:HttpGet("https://raw.githubusercontent.com/realredz/BloxFruits/main/Source.lua")
+end)
+
+if success then
+    Notify("AuraX [AX]", "Modüller yüklendi! Menü açılıyor...")
+    
+    -- Redz yazılarını AuraX'e çeviren 'Hafif' Patcher
+    task.spawn(function()
+        local CoreGui = game:GetService("CoreGui")
+        while task.wait(1) do
             for _, v in pairs(CoreGui:GetDescendants()) do
                 if v:IsA("TextLabel") or v:IsA("TextButton") then
                     if v.Text:find("Redz") or v.Text:find("redz") then
                         v.Text = v.Text:gsub("Redz Hub", "AuraX Hub")
                         v.Text = v.Text:gsub("Redz", "AuraX")
-                        v.Text = v.Text:gsub("redz", "aurax")
-                        v.TextColor3 = getgenv().AX_Settings.ThemeColor
                     end
                 end
             end
-        end)
-    end
-end)
+        end
+    end)
 
--- 3. GİRİŞ ANİMASYONU VE BİLDİRİM
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "AuraX [AX] Yükleniyor...",
-    Text = "Veri tabanı ve hile modülleri hazır hale getiriliyor.",
-    Icon = getgenv().AX_Settings.LogoID,
-    Duration = 10
-})
-
--- 4. ANA ÇEKİRDEĞİ YÜKLE (REDZ LATEST SOURCE)
--- Bu satır, orijinal Redz Hub'ın tüm o devasa (10k+ satır) kodunu AuraX maskesiyle çalıştırır.
-local success, err = pcall(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/realredz/BloxFruits/main/Source.lua"))()
-end)
-
-if not success then
-    -- Eğer ana kaynakta hata olursa AuraX'in kendi yedek motorunu devreye sokar.
-    warn("AuraX Hata: " .. tostring(err))
+    -- ANA KODU ÇALIŞTIR
+    loadstring(result)()
+else
+    Notify("HATA!", "Sunucuya bağlanılamadı. Tekrar deneyin.")
+    warn("AuraX Error: " .. tostring(result))
 end
