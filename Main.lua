@@ -1,39 +1,49 @@
--- [[ AuraX Hub | Arceus X Neo Optimized ]] --
+-- [[ AuraX Hub | The Final Execution ]] --
+-- Bu kod senin GitHub linkini en güvenli şekilde çalıştırır.
 
-local function SimpleNotify(txt)
+local githubLink = "https://raw.githubusercontent.com/Nenecosturan/AuraX-HUB-BloxFruits/refs/heads/main/Main.lua"
+
+local function Notify(title, text)
     game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "AuraX [AX]",
-        Text = txt,
-        Duration = 5
+        Title = title,
+        Text = text,
+        Duration = 8
     })
 end
 
-SimpleNotify("Arceus X Neo Algılandı. Yükleniyor...")
-
--- Arceus X'in çökmemesi için yüklemeyi bir saniye geciktiriyoruz
-task.wait(1.5)
-
-local success, err = pcall(function()
-    -- Redz Hub'ın en stabil ve Arceus uyumlu linkini deniyoruz
-    return loadstring(game:HttpGet("https://raw.githubusercontent.com/realredz/BloxFruits/main/Source.lua"))()
-end)
-
-if not success then
-    -- Eğer ilk deneme başarısız olursa alternatif yükleme metodu
-    warn("AuraX Hata: " .. tostring(err))
-    SimpleNotify("Yükleme başarısız. Konsolu kontrol et.")
-else
-    SimpleNotify("AuraX Menü Hazır!")
+-- 1. ADIM: BAĞLANTIYI DOĞRULA VE ÇEK
+local function ExecuteAuraX()
+    Notify("AuraX [AX]", "GitHub sunucusuna bağlanılıyor...")
     
-    -- Menü geldikten sonra isimleri değiştirmeyi dene (Hafif Mod)
-    task.spawn(function()
-        task.wait(5) -- Menünün tam yüklenmesini bekle
-        pcall(function()
-            for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
-                if v:IsA("TextLabel") and (v.Text:find("Redz") or v.Text:find("redz")) then
-                    v.Text = "AuraX Hub"
-                end
-            end
-        end)
+    local success, scriptContent = pcall(function()
+        return game:HttpGet(githubLink)
     end)
+
+    if success and scriptContent then
+        Notify("AuraX Başarılı", "Kod çekildi, Arceus motoruna yükleniyor...")
+        task.wait(1)
+        
+        -- 2. ADIM: KODU ÇALIŞTIR
+        local runSuccess, runError = pcall(function()
+            loadstring(scriptContent)()
+        end)
+
+        if not runSuccess then
+            warn("AuraX Çalıştırma Hatası: " .. tostring(runError))
+            Notify("Hata!", "Kod çalıştırılırken bir sorun oluştu.")
+        end
+    else
+        -- 3. ADIM: HATA DURUMUNDA YEDEK PLAN
+        warn("AuraX Bağlantı Hatası: " .. tostring(scriptContent))
+        Notify("Bağlantı Kesildi", "GitHub'a ulaşılamıyor. 5 saniye sonra tekrar denenecek...")
+        task.wait(5)
+        ExecuteAuraX() -- Otomatik Tekrar Deneme (Garantili Mod)
+    end
+end
+
+-- SİSTEMİ BAŞLAT
+if game.PlaceId == 2753915549 or game.PlaceId == 4442245219 or game.PlaceId == 7449423635 then
+    ExecuteAuraX()
+else
+    Notify("Hatalı Oyun", "Bu script sadece Blox Fruits için tasarlanmıştır!")
 end
