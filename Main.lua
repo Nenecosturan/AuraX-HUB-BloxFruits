@@ -1,8 +1,11 @@
--- [[ AuraX Hub | The Final Execution ]] --
--- Bu kod senin GitHub linkini en güvenli şekilde çalıştırır.
+-- [[ AuraX Hub | Ultimate Blox Fruits Script ]] --
+-- GitHub: Nenecosturan
 
-local githubLink = "https://raw.githubusercontent.com/Nenecosturan/AuraX-HUB-BloxFruits/refs/heads/main/Main.lua"
+-- 1. ÖN AYARLAR
+getgenv().AuraX_Loaded = true
+local PlaceID = game.PlaceId
 
+-- 2. BİLDİRİM FONKSİYONU
 local function Notify(title, text)
     game:GetService("StarterGui"):SetCore("SendNotification", {
         Title = title,
@@ -11,39 +14,35 @@ local function Notify(title, text)
     })
 end
 
--- 1. ADIM: BAĞLANTIYI DOĞRULA VE ÇEK
-local function ExecuteAuraX()
-    Notify("AuraX [AX]", "GitHub sunucusuna bağlanılıyor...")
+-- 3. OYUN KONTROLÜ VE YÜKLEME
+-- Blox Fruits ID'leri: 2753915549 (Sea 1), 4442245219 (Sea 2), 7449423635 (Sea 3)
+if PlaceID == 2753915549 or PlaceID == 4442245219 or PlaceID == 7449423635 then
+    Notify("AuraX Hub", "Hoş geldin! Blox Fruits modülleri hazırlanıyor...")
     
-    local success, scriptContent = pcall(function()
-        return game:HttpGet(githubLink)
+    -- REDZ HUB'I AURAX OLARAK ÇALIŞTIRAN ANA MOTOR
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/realredz/BloxFruits/main/Source.lua"))()
     end)
 
-    if success and scriptContent then
-        Notify("AuraX Başarılı", "Kod çekildi, Arceus motoruna yükleniyor...")
-        task.wait(1)
-        
-        -- 2. ADIM: KODU ÇALIŞTIR
-        local runSuccess, runError = pcall(function()
-            loadstring(scriptContent)()
+    if success then
+        -- Menüdeki yazıları AuraX yapmak için arka plan döngüsü
+        task.spawn(function()
+            while task.wait(2) do
+                pcall(function()
+                    for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
+                        if v:IsA("TextLabel") or v:IsA("TextButton") then
+                            if v.Text:find("Redz") or v.Text:find("redz") then
+                                v.Text = v.Text:gsub("Redz", "AuraX")
+                            end
+                        end
+                    end
+                end)
+            end
         end)
-
-        if not runSuccess then
-            warn("AuraX Çalıştırma Hatası: " .. tostring(runError))
-            Notify("Hata!", "Kod çalıştırılırken bir sorun oluştu.")
-        end
     else
-        -- 3. ADIM: HATA DURUMUNDA YEDEK PLAN
-        warn("AuraX Bağlantı Hatası: " .. tostring(scriptContent))
-        Notify("Bağlantı Kesildi", "GitHub'a ulaşılamıyor. 5 saniye sonra tekrar denenecek...")
-        task.wait(5)
-        ExecuteAuraX() -- Otomatik Tekrar Deneme (Garantili Mod)
+        Notify("Hata!", "Motor yüklenemedi. Lütfen tekrar dene.")
+        warn("AuraX Error: " .. tostring(err))
     end
-end
-
--- SİSTEMİ BAŞLAT
-if game.PlaceId == 2753915549 or game.PlaceId == 4442245219 or game.PlaceId == 7449423635 then
-    ExecuteAuraX()
 else
-    Notify("Hatalı Oyun", "Bu script sadece Blox Fruits için tasarlanmıştır!")
+    Notify("Hatalı Oyun", "Bu script sadece Blox Fruits içindir!")
 end
